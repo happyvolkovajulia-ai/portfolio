@@ -253,6 +253,10 @@ footer{padding:96px 0 76px;background:var(--bg-alt)}
   html{scroll-behavior:auto}
 }
 </style>
+<noscript><style>
+  /* Без JavaScript контент обязан быть виден — иначе страница пустая */
+  .reveal{opacity:1 !important;transform:none !important}
+</style></noscript>
 </head>
 <body>
 
@@ -468,17 +472,26 @@ footer{padding:96px 0 76px;background:var(--bg-alt)}
 
 <script>
 (function(){
-  var els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) {
-    els.forEach(function(e){ e.classList.add('in'); });
-    return;
-  }
+  var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  var showAll = function(){ els.forEach(function(e){ e.classList.add('in'); }); };
+
+  if (!('IntersectionObserver' in window)) { showAll(); return; }
+
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(en){
-      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      // Показываем и те, что вошли в экран, и те, что уже проскроллены выше:
+      // иначе блоки, мимо которых проехали, остаются невидимыми.
+      if (en.isIntersecting || en.boundingClientRect.top < 0) {
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      }
     });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  }, { rootMargin: '0px 0px -60px 0px', threshold: 0 });
+
   els.forEach(function(e){ io.observe(e); });
+
+  // Страховка: что бы ни случилось, через 3 секунды показываем всё.
+  setTimeout(showAll, 3000);
 })();
 </script>
 

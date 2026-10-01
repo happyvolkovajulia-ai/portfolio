@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Иван Волков — сайты, лендинги, доработка сайтов</title>
+<meta name="description" content="Делаю сайты и лендинги под ключ: адаптивная вёрстка, формы заявок, доработка и починка существующих сайтов. Работаю удалённо.">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --bg2:#12161b;
+    --card:#161b22;
+    --line:#242c37;
+    --fg:#e9eef5;
+    --muted:#9aa7b6;
+    --accent:#ff7a18;
+    --accent2:#ffab5e;
+    --ok:#39d98a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ---------- шапка ---------- */
+  header{
+    padding:88px 0 64px;
+    background:
+      radial-gradient(900px 420px at 12% -10%, rgba(255,122,24,.20), transparent 60%),
+      radial-gradient(700px 380px at 92% 0%, rgba(90,140,255,.14), transparent 60%);
+    border-bottom:1px solid var(--line);
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(57,217,138,.10);
+    border:1px solid rgba(57,217,138,.32);
+    color:var(--ok);
+    font-size:13.5px;font-weight:600;
+    padding:6px 13px;border-radius:999px;margin-bottom:22px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(57,217,138,.16)}
+  h1{
+    font-size:clamp(30px,5.2vw,50px);
+    line-height:1.12;letter-spacing:-.02em;font-weight:800;
+    margin-bottom:18px;
+  }
+  h1 .hl{
+    background:linear-gradient(100deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lead{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:660px;margin-bottom:30px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{
+    display:inline-block;padding:13px 24px;border-radius:11px;
+    font-weight:650;font-size:15.5px;border:1px solid transparent;
+    transition:transform .12s ease,opacity .12s ease;
+  }
+  .btn:hover{transform:translateY(-2px);text-decoration:none}
+  .btn-primary{background:linear-gradient(100deg,var(--accent),var(--accent2));color:#1a1005}
+  .btn-ghost{border-color:var(--line);color:var(--fg);background:rgba(255,255,255,.03)}
+
+  /* ---------- секции ---------- */
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:none}
+  h2{font-size:clamp(21px,3vw,28px);letter-spacing:-.01em;font-weight:750;margin-bottom:10px}
+  .sub{color:var(--muted);margin-bottom:34px;max-width:640px}
+
+  /* ---------- услуги ---------- */
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(255px,1fr))}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:24px;
+    transition:border-color .15s ease,transform .15s ease;
+  }
+  .card:hover{border-color:#33404f;transform:translateY(-3px)}
+  .card h3{font-size:17px;font-weight:700;margin-bottom:9px}
+  .card p{color:var(--muted);font-size:14.8px}
+  .price{
+    display:inline-block;margin-top:14px;
+    font-weight:750;color:var(--accent2);
+    background:rgba(255,122,24,.10);
+    border:1px solid rgba(255,122,24,.26);
+    padding:4px 12px;border-radius:8px;font-size:14.5px;
+  }
+
+  /* ---------- проекты ---------- */
+  .proj{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:26px;margin-bottom:16px;
+  }
+  .proj-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline}
+  .proj h3{font-size:18.5px;font-weight:700;margin-bottom:6px}
+  .proj .role{color:var(--muted);font-size:14px;white-space:nowrap}
+  .proj p{color:var(--muted);font-size:15px;margin:10px 0 14px}
+  .tags{display:flex;gap:7px;flex-wrap:wrap}
+  .tag{
+    font-size:12.6px;font-weight:600;color:#c6d3e2;
+    background:#1e2630;border:1px solid #2c3743;
+    padding:4px 10px;border-radius:7px;
+  }
+
+  /* ---------- навыки ---------- */
+  .skills{display:flex;gap:9px;flex-wrap:wrap}
+  .skill{
+    font-size:14.2px;padding:8px 14px;border-radius:9px;
+    background:var(--bg2);border:1px solid var(--line);color:#d5dfea;
+  }
+
+  /* ---------- футер ---------- */
+  footer{padding:56px 0 72px}
+  .contact{
+    background:linear-gradient(160deg,var(--bg2),var(--card));
+    border:1px solid var(--line);border-radius:18px;padding:34px;
+  }
+  .contact h2{margin-bottom:8px}
+  .contact p{color:var(--muted);margin-bottom:22px;max-width:560px}
+  .meta{color:#6f7d8c;font-size:13.5px;margin-top:28px}
+  @media(max-width:560px){
+    header{padding:56px 0 44px}
+    section{padding:48px 0}
+    .proj .role{white-space:normal}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="badge"><span class="dot"></span>Свободен для новых заказов</div>
+    <h1>Делаю <span class="hl">сайты и лендинги</span>,<br>которые приносят заявки</h1>
+    <p class="lead">
+      Адаптивная вёрстка, формы заявок, доработка и починка существующих сайтов.
+      Работаю удалённо по всей России. Не просто «красиво» — чтобы сайт открывался
+      на телефоне, быстро грузился и приводил клиентов.
+    </p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#contact">Обсудить задачу</a>
+      <a class="btn btn-ghost" href="#projects">Посмотреть проекты</a>
+    </div>
+  </div>
+</header>
+
+<section id="services">
+  <div class="wrap">
+    <h2>Что я делаю</h2>
+    <p class="sub">Фиксирую цену и срок до начала работы. Показываю готовое на своём хостинге — правки бесплатно, пока не понравится.</p>
+    <div class="grid g3">
+
+      <div class="card">
+        <h3>Лендинг под ключ</h3>
+        <p>Одностраничный сайт под ваш товар или услугу: адаптив под телефон, форма заявки, подключение домена и хостинга.</p>
+        <span class="price">от 8 000 ₽</span>
+      </div>
+
+      <div class="card">
+        <h3>Сайт-визитка 3–5 страниц</h3>
+        <p>Небольшой многостраничный сайт для компании или специалиста. Понятная структура, аккуратная вёрстка.</p>
+        <span class="price">от 15 000 ₽</span>
+      </div>
+
+      <div class="card">
+        <h3>Доработка и починка сайта</h3>
+        <p>Поехала вёрстка, не работает форма, медленно грузится, криво на телефоне — исправлю. Мелкие правки в день обращения.</p>
+        <span class="price">от 3 000 ₽</span>
+      </div>
+
+      <div class="card">
+        <h3>Telegram-бот для заявок</h3>
+        <p>Бот принимает заявки и присылает их вам в чат. Каталог услуг, запись на консультацию, выгрузка в таблицу.</p>
+        <span class="price">от 6 000 ₽</span>
+      </div>
+
+      <div class="card">
+        <h3>Адаптив под телефон</h3>
+        <p>Сайт, который нормально выглядит на любом экране. Отдельно от остальных работ — если сайт уже есть.</p>
+        <span class="price">от 3 000 ₽</span>
+      </div>
+
+      <div class="card">
+        <h3>Автоматизация рутины</h3>
+        <p>Скрипт, который делает за вас повторяющуюся работу: собирает данные, обрабатывает файлы, выгружает отчёты.</p>
+        <span class="price">от 4 000 ₽</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <h2>Проекты</h2>
+    <p class="sub">Не учебные задания — рабочие вещи, сделанные целиком: от интерфейса до серверной части.</p>
+
+    <div class="proj">
+      <div class="proj-top">
+        <h3>Веб-приложение для салона — запись клиентов</h3>
+        <span class="role">Fullstack, 2026</span>
+      </div>
+      <p>
+        Полноценное приложение с личным кабинетом, расписанием и записью. Клиентская часть на React,
+        серверная — на Node.js с базой данных, авторизация с хешированием паролей и токенами.
+        Есть миграции базы, наполнение тестовыми данными и автотесты.
+      </p>
+      <div class="tags">
+        <span class="tag">React 19</span>
+        <span class="tag">TypeScript</span>
+        <span class="tag">Vite</span>
+        <span class="tag">Tailwind CSS 4</span>
+        <span class="tag">Node.js</span>
+        <span class="tag">Express 5</span>
+        <span class="tag">JWT</span>
+        <span class="tag">SQL</span>
+      </div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-top">
+        <h3>Мобильное приложение-головоломка «Смыслы»</h3>
+        <span class="role">Flutter, 2026</span>
+      </div>
+      <p>
+        Игра на поиск скрытых связей между словами: 16 слов, 4 категории. Локальное сохранение прогресса,
+        загрузка новых наборов с сервера, поддержка офлайн-режима.
+      </p>
+      <div class="tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Dart</span>
+        <span class="tag">Provider</span>
+        <span class="tag">REST API</span>
+        <span class="tag">Адаптивный UI</span>
+      </div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-top">
+        <h3>Калькулятор НФП-2023</h3>
+        <span class="role">Flutter, 2026</span>
+      </div>
+      <p>
+        Приложение для расчёта нормативов физической подготовки по приказу МО РФ. Выбор категории,
+        мгновенный подсчёт баллов, сохранение результатов и экспорт. Готово к публикации в RuStore.
+      </p>
+      <div class="tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Dart</span>
+        <span class="tag">Riverpod</span>
+        <span class="tag">go_router</span>
+        <span class="tag">Hive</span>
+      </div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-top">
+        <h3>Лендинги и страницы для приложений</h3>
+        <span class="role">HTML / CSS, 2026</span>
+      </div>
+      <p>
+        Страницы под мобильные приложения: политика конфиденциальности, описание, оформление под требования
+        магазинов приложений. Чистая адаптивная вёрстка без тяжёлых библиотек, моментальная загрузка.
+      </p>
+      <div class="tags">
+        <span class="tag">HTML5</span>
+        <span class="tag">CSS3</span>
+        <span class="tag">Адаптивная вёрстка</span>
+        <span class="tag">GitHub Pages</span>
+      </div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-top">
+        <h3>Десктопная утилита для скачивания видео</h3>
+        <span class="role">Python, 2026</span>
+      </div>
+      <p>
+        Программа с графическим интерфейсом: скачивает видео и audio по ссылке, выбор качества,
+        сборка в один исполняемый файл без установки Python.
+      </p>
+      <div class="tags">
+        <span class="tag">Python</span>
+        <span class="tag">yt-dlp</span>
+        <span class="tag">GUI</span>
+        <span class="tag">PyInstaller</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <h2>Технологии</h2>
+    <p class="sub">Работаю с этим каждый день — не «проходил курс», а делал проекты.</p>
+    <div class="skills">
+      <span class="skill">HTML5</span>
+      <span class="skill">CSS3</span>
+      <span class="skill">Адаптивная вёрстка</span>
+      <span class="skill">JavaScript</span>
+      <span class="skill">TypeScript</span>
+      <span class="skill">React</span>
+      <span class="skill">Tailwind CSS</span>
+      <span class="skill">Vite</span>
+      <span class="skill">Node.js</span>
+      <span class="skill">Express</span>
+      <span class="skill">REST API</span>
+      <span class="skill">SQL</span>
+      <span class="skill">Git</span>
+      <span class="skill">Python</span>
+      <span class="skill">Flutter</span>
+      <span class="skill">Dart</span>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="contact">
+      <h2>Обсудим задачу?</h2>
+      <p>
+        Напишите, что нужно сделать. Скажу честно, сколько это стоит и сколько займёт времени —
+        бесплатно и без обязательств. Если задача не моя, скажу прямо.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/happyvolkovajulia-ai">Мои проекты на GitHub</a>
+      </div>
+      <!-- CONTACT-TODO: сюда добавить телефон / Telegram / e-mail после подтверждения -->
+      <p class="meta">Иван Волков · фронтенд-разработчик и верстальщик · работаю удалённо по всей России</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

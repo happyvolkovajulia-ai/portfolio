@@ -10,8 +10,7 @@
 <style>
 /* ============================================================
    ШРИФТЫ — размещены локально, без внешних сервисов.
-   Разбиты на подмножества (кириллица / латиница), поэтому
-   грузится только то, что реально нужно странице.
+   Разбиты на подмножества, поэтому грузится только нужное.
    ============================================================ */
 @font-face{font-family:'Onest';font-style:normal;font-weight:400;font-display:swap;
   src:url('fonts/onest-cyrillic-400-normal.woff2') format('woff2');
@@ -51,9 +50,9 @@
   src:url('fonts/unbounded-latin-700-normal.woff2') format('woff2');
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 
-/* Знак рубля ₽ есть только в подмножестве latin-ext (он лежит в диапазоне
-   U+20AD–20C0), поэтому подключаем его отдельным правилом. Без этого ₽
-   рисуется системным шрифтом и выбивается из подписей цен. */
+/* Знак рубля ₽ есть только в подмножестве latin-ext (диапазон U+20AD–20C0),
+   поэтому подключаем его отдельным правилом. Без этого ₽ рисуется системным
+   шрифтом и выбивается из подписей цен. */
 @font-face{font-family:'Unbounded';font-style:normal;font-weight:600;font-display:swap;
   src:url('fonts/unbounded-latin-ext-600-normal.woff2') format('woff2');
   unicode-range:U+20BD}
@@ -75,13 +74,17 @@
   --line:rgba(0,0,0,.09);
   --accent:#0071e3;
   --accent-hover:#0077ed;
-  --radius-panel:34px;
   --radius-card:26px;
   --radius-frame:16px;
   --max:1120px;
   --nav-h:52px;
   --font-display:'Unbounded',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   --font-text:'Onest',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  /* Настройки эффекта появления */
+  --reveal-blur:20px;
+  --reveal-dim:.45;
+  --reveal-shift:34px;
+  --reveal-step:90ms;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -91,7 +94,7 @@ html{
   -webkit-text-size-adjust:100%;
 }
 body{
-  background:#e9e9ee;
+  background:var(--bg);
   color:var(--fg);
   font-family:var(--font-text);
   font-size:17px;
@@ -157,10 +160,10 @@ a:hover{text-decoration:underline}
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   border-radius:980px;font-size:15.5px;font-weight:500;
   padding:12px 25px;border:1px solid transparent;
-  transition:background-color .2s ease,color .2s ease,border-color .2s ease,transform .2s ease;
+  transition:background-color .2s ease,color .2s ease,border-color .2s ease,translate .2s ease;
   white-space:nowrap;font-family:var(--font-text);
 }
-.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn:hover{text-decoration:none;translate:0 -2px}
 .btn-solid{background:var(--accent);color:#fff}
 .btn-solid:hover{background:var(--accent-hover)}
 .btn-line{border-color:var(--fg);color:var(--fg)}
@@ -170,28 +173,22 @@ a:hover{text-decoration:underline}
    Типографика
    ============================================================ */
 h1{
-  font-family:var(--font-display);
-  font-weight:700;
+  font-family:var(--font-display);font-weight:700;
   font-size:clamp(31px,5.4vw,62px);
-  line-height:1.09;
-  letter-spacing:-.035em;
+  line-height:1.09;letter-spacing:-.035em;
 }
 h2{
-  font-family:var(--font-display);
-  font-weight:700;
+  font-family:var(--font-display);font-weight:700;
   font-size:clamp(23px,3.5vw,40px);
-  line-height:1.14;
-  letter-spacing:-.032em;
+  line-height:1.14;letter-spacing:-.032em;
 }
 h3{
-  font-family:var(--font-text);
-  font-weight:700;
+  font-family:var(--font-text);font-weight:700;
   font-size:20px;line-height:1.28;letter-spacing:-.022em;
 }
 .lead{
   font-size:clamp(17px,2vw,21px);
-  line-height:1.48;letter-spacing:-.012em;
-  color:var(--muted);
+  line-height:1.48;letter-spacing:-.012em;color:var(--muted);
 }
 .eyebrow{
   font-family:var(--font-display);
@@ -202,15 +199,16 @@ h3{
 .center .lead{margin-left:auto;margin-right:auto}
 
 /* ============================================================
-   Хиро — обычный блок, не участвует в стопке
+   Секции — обычный поток, без наложения
    ============================================================ */
+section{padding:96px 0}
+.sec-alt{background:var(--bg-alt)}
+
 .hero{
-  position:relative;z-index:1;
-  padding:calc(var(--nav-h) + 92px) 0 100px;
+  padding:calc(var(--nav-h) + 92px) 0 96px;
   background:
     radial-gradient(820px 460px at 50% -14%, rgba(0,113,227,.13), transparent 62%),
     var(--bg);
-  border-radius:0 0 var(--radius-panel) var(--radius-panel);
 }
 .hero h1{max-width:16ch;margin:0 auto 24px}
 .hero .lead{max-width:600px;margin:0 auto 34px}
@@ -225,40 +223,48 @@ h3{
   box-shadow:0 0 0 4px rgba(48,209,88,.16)}
 
 /* ============================================================
-   СТОПКА СЕКЦИЙ — «нахлёст»
-   Каждая секция прилипает к верху, следующая наезжает сверху.
+   ПОЯВЛЕНИЕ ИЗ РАЗМЫТИЯ И ТЕМНОТЫ
+   Анимируем только opacity / transform / filter — они идут
+   по GPU и не вызывают пересчёт макета.
    ============================================================ */
-.stack{position:relative}
-.panel{position:sticky;top:0}
-.panel-inner{
-  position:relative;
-  border-radius:var(--radius-panel) var(--radius-panel) 0 0;
-  padding:96px 0 104px;
-  background:var(--bg);
-  transform-origin:50% 0;
-  will-change:transform;
-  box-shadow:0 -30px 60px -34px rgba(0,0,0,.30);
-  overflow:hidden;
+@media (prefers-reduced-motion: no-preference){
+  .reveal{
+    opacity:0;
+    transform:translate3d(0,var(--reveal-shift),0) scale(.98);
+    filter:blur(var(--reveal-blur)) brightness(calc(1 - var(--reveal-dim)));
+    transition:
+      opacity .85s cubic-bezier(.22,.8,.24,1),
+      transform .95s cubic-bezier(.22,.8,.24,1),
+      filter 1.05s cubic-bezier(.22,.8,.24,1);
+    transition-delay:calc(var(--i,0) * var(--reveal-step));
+    will-change:opacity,transform,filter;
+  }
+  .reveal.in{
+    opacity:1;
+    transform:none;
+    filter:none;
+  }
+  /* Когда появление закончилось — снимаем нагрузку с GPU */
+  .reveal.done{ will-change:auto }
 }
-.panel-alt .panel-inner{background:var(--bg-alt)}
-/* затемнение уходящей секции — тем же приёмом, что в iOS */
-.panel-inner::after{
-  content:'';position:absolute;inset:0;background:#000;
-  opacity:var(--dim,0);pointer-events:none;transition:opacity .05s linear;
+
+/* Без анимации (или без JS) блоки просто видны */
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none;filter:none}
 }
-.panel-inner>*{position:relative;z-index:1}
 
 /* ============================================================
    Карточки услуг
    ============================================================ */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:20px}
 .card{
-  background:var(--bg);border-radius:var(--radius-card);padding:32px 28px;
+  background:#fff;border-radius:var(--radius-card);padding:32px 28px;
   border:1px solid rgba(0,0,0,.05);
-  transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease;
+  /* translate — отдельное свойство, поэтому подъём при наведении
+     не конфликтует с анимацией появления по transform */
+  transition:translate .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease;
 }
-.panel-alt .card{background:#fff}
-.card:hover{transform:translateY(-4px);box-shadow:0 22px 44px -24px rgba(0,0,0,.22)}
+.card:hover{translate:0 -5px;box-shadow:0 22px 44px -24px rgba(0,0,0,.22)}
 .card p{color:var(--muted);font-size:15px;margin-top:10px}
 .price{
   display:inline-block;margin-top:20px;
@@ -332,29 +338,15 @@ h3{
 }
 
 /* ============================================================
-   Футер — последняя секция стопки
+   Футер
    ============================================================ */
+footer{padding:96px 0 76px}
 .foot-meta{margin-top:34px;font-size:13px;color:var(--muted);line-height:1.75}
-
-/* ============================================================
-   Появление при скролле
-   ============================================================ */
-.reveal{transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
-.js .reveal{opacity:0;transform:translateY(20px)}
-.js .reveal.in{opacity:1;transform:none}
-
-@media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .js .reveal{opacity:1;transform:none;transition:none}
-  .panel-inner{transform:none !important}
-  .panel-inner::after{opacity:0 !important}
-  .btn:hover,.card:hover{transform:none}
-}
 </style>
 <script>document.documentElement.classList.add('js');</script>
 <noscript><style>
   /* Без JavaScript контент обязан быть виден — иначе страница пустая */
-  .reveal{opacity:1 !important;transform:none !important}
+  .reveal{opacity:1 !important;transform:none !important;filter:none !important}
 </style></noscript>
 </head>
 <body>
@@ -389,182 +381,170 @@ h3{
   </div>
 </header>
 
-<main class="stack">
-
-  <!-- ======================= УСЛУГИ ======================= -->
-  <section class="panel panel-alt" id="services">
-    <div class="panel-inner">
-      <div class="wrap">
-        <div class="center" style="margin-bottom:56px">
-          <p class="eyebrow">Услуги</p>
-          <h2>Что я делаю</h2>
-          <p class="lead" style="max-width:610px;margin-top:16px">
-            Цену и срок называю до начала работы. Готовое показываю на своём хостинге —
-            правки бесплатно, пока не понравится.
-          </p>
-        </div>
-        <div class="cards">
-          <div class="card reveal">
-            <h3>Лендинг под ключ</h3>
-            <p>Одностраничный сайт под ваш товар или услугу. Адаптив под телефон, форма заявки, домен и хостинг.</p>
-            <div class="price">от 8 000 ₽</div>
-          </div>
-          <div class="card reveal">
-            <h3>Вёрстка по макету</h3>
-            <p>Точная вёрстка по Figma или PSD: чистый код, семантика, проверка во всех браузерах.</p>
-            <div class="price">от 4 000 ₽</div>
-          </div>
-          <div class="card reveal">
-            <h3>Сайт-визитка</h3>
-            <p>Небольшой многостраничный сайт для компании или специалиста. Понятная структура, аккуратный дизайн.</p>
-            <div class="price">от 15 000 ₽</div>
-          </div>
-          <div class="card reveal">
-            <h3>Доработка и починка</h3>
-            <p>Поехала вёрстка, не работает форма, медленно грузится, криво на телефоне — исправлю.</p>
-            <div class="price">от 3 000 ₽</div>
-          </div>
-          <div class="card reveal">
-            <h3>Telegram-бот</h3>
-            <p>Принимает заявки и присылает их вам в чат. Каталог услуг, запись, выгрузка в таблицу.</p>
-            <div class="price">от 6 000 ₽</div>
-          </div>
-          <div class="card reveal">
-            <h3>Адаптив под телефон</h3>
-            <p>Сайт, который нормально выглядит на любом экране. Отдельно от остальных работ.</p>
-            <div class="price">от 3 000 ₽</div>
-          </div>
-        </div>
+<!-- ======================= УСЛУГИ ======================= -->
+<section id="services" class="sec-alt">
+  <div class="wrap">
+    <div class="center" style="margin-bottom:56px">
+      <p class="eyebrow">Услуги</p>
+      <h2>Что я делаю</h2>
+      <p class="lead" style="max-width:610px;margin-top:16px">
+        Цену и срок называю до начала работы. Готовое показываю на своём хостинге —
+        правки бесплатно, пока не понравится.
+      </p>
+    </div>
+    <div class="cards">
+      <div class="card reveal" style="--i:0">
+        <h3>Лендинг под ключ</h3>
+        <p>Одностраничный сайт под ваш товар или услугу. Адаптив под телефон, форма заявки, домен и хостинг.</p>
+        <div class="price">от 8 000 ₽</div>
+      </div>
+      <div class="card reveal" style="--i:1">
+        <h3>Вёрстка по макету</h3>
+        <p>Точная вёрстка по Figma или PSD: чистый код, семантика, проверка во всех браузерах.</p>
+        <div class="price">от 4 000 ₽</div>
+      </div>
+      <div class="card reveal" style="--i:2">
+        <h3>Сайт-визитка</h3>
+        <p>Небольшой многостраничный сайт для компании или специалиста. Понятная структура, аккуратный дизайн.</p>
+        <div class="price">от 15 000 ₽</div>
+      </div>
+      <div class="card reveal" style="--i:0">
+        <h3>Доработка и починка</h3>
+        <p>Поехала вёрстка, не работает форма, медленно грузится, криво на телефоне — исправлю.</p>
+        <div class="price">от 3 000 ₽</div>
+      </div>
+      <div class="card reveal" style="--i:1">
+        <h3>Telegram-бот</h3>
+        <p>Принимает заявки и присылает их вам в чат. Каталог услуг, запись, выгрузка в таблицу.</p>
+        <div class="price">от 6 000 ₽</div>
+      </div>
+      <div class="card reveal" style="--i:2">
+        <h3>Адаптив под телефон</h3>
+        <p>Сайт, который нормально выглядит на любом экране. Отдельно от остальных работ.</p>
+        <div class="price">от 3 000 ₽</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ======================= ПРОЕКТЫ ======================= -->
-  <section class="panel" id="projects">
-    <div class="panel-inner">
-      <div class="wrap">
-        <div class="center" style="margin-bottom:74px">
-          <p class="eyebrow">Проекты</p>
-          <h2>Сделано целиком —<br>от интерфейса до сервера</h2>
-        </div>
-
-        <div class="proj reveal">
-          <div>
-            <p class="meta">Веб-приложение · 2026</p>
-            <h3>Сайт и система записи для салона массажа</h3>
-            <p class="desc">
-              Полноценное приложение: лендинг, личный кабинет, расписание и онлайн-запись.
-              Клиентская часть на React, серверная — на Node.js с базой данных, авторизация
-              с хешированием паролей и токенами. Есть миграции базы и автотесты.
-            </p>
-            <div class="tags">
-              <span class="tag">React 19</span><span class="tag">TypeScript</span><span class="tag">Vite</span>
-              <span class="tag">Tailwind CSS</span><span class="tag">Node.js</span><span class="tag">Express</span>
-              <span class="tag">JWT</span><span class="tag">SQL</span>
-            </div>
-          </div>
-          <div class="proj-media">
-            <div class="browser">
-              <div class="browser-bar"><i></i><i></i><i></i><span>tihaya.ru</span></div>
-              <img src="img/ant-1.png" alt="Лендинг салона массажа: крупный заголовок, зелёно-кремовая палитра">
-            </div>
-          </div>
-        </div>
-
-        <div class="proj rev reveal">
-          <div>
-            <p class="meta">Мобильное приложение · Flutter · 2026</p>
-            <h3>«Смыслы» — игра на поиск связей</h3>
-            <p class="desc">
-              Головоломка: 16 слов, 4 скрытые категории, русский аналог NYT Connections.
-              Четыре игровых режима, архив, локальное сохранение прогресса и загрузка
-              новых наборов с сервера. Подготовлено к публикации в RuStore.
-            </p>
-            <div class="tags">
-              <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Provider</span>
-              <span class="tag">REST API</span><span class="tag">RuStore</span>
-            </div>
-          </div>
-          <div class="proj-media">
-            <div class="phones">
-              <div class="phone"><div class="phone-screen"><img src="img/slova-1.png" alt="Экран «Смыслы»: главный экран"></div></div>
-              <div class="phone"><div class="phone-screen"><img src="img/slova-2.png" alt="Экран «Смыслы»: игровое поле"></div></div>
-              <div class="phone"><div class="phone-screen"><img src="img/slova-3.png" alt="Экран «Смыслы»: архив"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="proj reveal">
-          <div>
-            <p class="meta">Приложение · Flutter · 2026</p>
-            <h3>Калькулятор НФП-2023</h3>
-            <p class="desc">
-              Расчёт нормативов физической подготовки по приказу МО РФ. Пошаговый ввод данных,
-              мгновенный подсчёт баллов, разбор ошибок и итоговая ведомость. Сохранение
-              результатов и экспорт.
-            </p>
-            <div class="tags">
-              <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Riverpod</span>
-              <span class="tag">go_router</span><span class="tag">Hive</span>
-            </div>
-          </div>
-          <div class="proj-media">
-            <div class="browser">
-              <div class="browser-bar"><i></i><i></i><i></i><span>Калькулятор НФП-2023</span></div>
-              <img src="img/nfp-1.png" alt="Калькулятор НФП-2023: конструктор контрольной проверки">
-            </div>
-          </div>
-        </div>
-
-      </div>
+<!-- ======================= ПРОЕКТЫ ======================= -->
+<section id="projects">
+  <div class="wrap">
+    <div class="center" style="margin-bottom:74px">
+      <p class="eyebrow">Проекты</p>
+      <h2>Сделано целиком —<br>от интерфейса до сервера</h2>
     </div>
-  </section>
 
-  <!-- ======================= ЦЕНЫ ======================= -->
-  <section class="panel panel-alt" id="prices">
-    <div class="panel-inner">
-      <div class="wrap narrow">
-        <div class="center" style="margin-bottom:42px">
-          <p class="eyebrow">Цены</p>
-          <h2>Прозрачно и без сюрпризов</h2>
-        </div>
-        <div class="rows">
-          <div class="row"><div><div class="name">Лендинг под ключ</div><div class="sub">Адаптив, форма заявки, публикация</div></div><div class="sum">от 8 000 ₽</div></div>
-          <div class="row"><div><div class="name">Сайт-визитка 3–5 страниц</div><div class="sub">Структура, вёрстка, наполнение</div></div><div class="sum">от 15 000 ₽</div></div>
-          <div class="row"><div><div class="name">Вёрстка по макету</div><div class="sub">Figma / PSD, кроссбраузерность</div></div><div class="sum">от 4 000 ₽</div></div>
-          <div class="row"><div><div class="name">Доработка или починка сайта</div><div class="sub">Мелкие правки — в день обращения</div></div><div class="sum">от 3 000 ₽</div></div>
-          <div class="row"><div><div class="name">Адаптив под телефон</div><div class="sub">Если сайт уже есть</div></div><div class="sum">от 3 000 ₽</div></div>
-          <div class="row"><div><div class="name">Telegram-бот для заявок</div><div class="sub">Приём заявок, каталог, выгрузка</div></div><div class="sum">от 6 000 ₽</div></div>
-        </div>
-        <p style="color:var(--muted);font-size:14px;margin-top:24px">
-          Точную цену называю после того, как увижу задачу. Смотрю бесплатно и без обязательств.
+    <div class="proj reveal">
+      <div>
+        <p class="meta">Веб-приложение · 2026</p>
+        <h3>Сайт и система записи для салона массажа</h3>
+        <p class="desc">
+          Полноценное приложение: лендинг, личный кабинет, расписание и онлайн-запись.
+          Клиентская часть на React, серверная — на Node.js с базой данных, авторизация
+          с хешированием паролей и токенами. Есть миграции базы и автотесты.
         </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================= КОНТАКТ ======================= -->
-  <section class="panel" id="contact">
-    <div class="panel-inner" style="padding-bottom:76px">
-      <div class="wrap center">
-        <h2>Расскажите, что нужно сделать</h2>
-        <p class="lead" style="max-width:560px;margin:18px auto 34px">
-          Отвечу в течение часа. Скажу честно, сколько это стоит и сколько займёт времени.
-          Если задача не моя — скажу прямо.
-        </p>
-        <div class="hero-cta">
-          <a class="btn btn-solid" href="mailto:volkovepta@gmail.com">volkovepta@gmail.com</a>
-          <a class="btn btn-line" href="https://github.com/happyvolkovajulia-ai">Проекты на GitHub</a>
+        <div class="tags">
+          <span class="tag">React 19</span><span class="tag">TypeScript</span><span class="tag">Vite</span>
+          <span class="tag">Tailwind CSS</span><span class="tag">Node.js</span><span class="tag">Express</span>
+          <span class="tag">JWT</span><span class="tag">SQL</span>
         </div>
-        <p class="foot-meta">
-          Иван Волков · вёрстка и разработка сайтов<br>
-          Работаю удалённо по всей России · Серпухов, Московская область
-        </p>
+      </div>
+      <div class="proj-media">
+        <div class="browser">
+          <div class="browser-bar"><i></i><i></i><i></i><span>tihaya.ru</span></div>
+          <img src="img/ant-1.png" alt="Лендинг салона массажа: крупный заголовок, зелёно-кремовая палитра">
+        </div>
       </div>
     </div>
-  </section>
 
-</main>
+    <div class="proj rev reveal">
+      <div>
+        <p class="meta">Мобильное приложение · Flutter · 2026</p>
+        <h3>«Смыслы» — игра на поиск связей</h3>
+        <p class="desc">
+          Головоломка: 16 слов, 4 скрытые категории, русский аналог NYT Connections.
+          Четыре игровых режима, архив, локальное сохранение прогресса и загрузка
+          новых наборов с сервера. Подготовлено к публикации в RuStore.
+        </p>
+        <div class="tags">
+          <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Provider</span>
+          <span class="tag">REST API</span><span class="tag">RuStore</span>
+        </div>
+      </div>
+      <div class="proj-media">
+        <div class="phones">
+          <div class="phone"><div class="phone-screen"><img src="img/slova-1.png" alt="Экран «Смыслы»: главный экран"></div></div>
+          <div class="phone"><div class="phone-screen"><img src="img/slova-2.png" alt="Экран «Смыслы»: игровое поле"></div></div>
+          <div class="phone"><div class="phone-screen"><img src="img/slova-3.png" alt="Экран «Смыслы»: архив"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj reveal">
+      <div>
+        <p class="meta">Приложение · Flutter · 2026</p>
+        <h3>Калькулятор НФП-2023</h3>
+        <p class="desc">
+          Расчёт нормативов физической подготовки по приказу МО РФ. Пошаговый ввод данных,
+          мгновенный подсчёт баллов, разбор ошибок и итоговая ведомость. Сохранение
+          результатов и экспорт.
+        </p>
+        <div class="tags">
+          <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Riverpod</span>
+          <span class="tag">go_router</span><span class="tag">Hive</span>
+        </div>
+      </div>
+      <div class="proj-media">
+        <div class="browser">
+          <div class="browser-bar"><i></i><i></i><i></i><span>Калькулятор НФП-2023</span></div>
+          <img src="img/nfp-1.png" alt="Калькулятор НФП-2023: конструктор контрольной проверки">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= ЦЕНЫ ======================= -->
+<section id="prices" class="sec-alt">
+  <div class="wrap narrow">
+    <div class="center" style="margin-bottom:42px">
+      <p class="eyebrow">Цены</p>
+      <h2>Прозрачно и без сюрпризов</h2>
+    </div>
+    <div class="rows reveal">
+      <div class="row"><div><div class="name">Лендинг под ключ</div><div class="sub">Адаптив, форма заявки, публикация</div></div><div class="sum">от 8 000 ₽</div></div>
+      <div class="row"><div><div class="name">Сайт-визитка 3–5 страниц</div><div class="sub">Структура, вёрстка, наполнение</div></div><div class="sum">от 15 000 ₽</div></div>
+      <div class="row"><div><div class="name">Вёрстка по макету</div><div class="sub">Figma / PSD, кроссбраузерность</div></div><div class="sum">от 4 000 ₽</div></div>
+      <div class="row"><div><div class="name">Доработка или починка сайта</div><div class="sub">Мелкие правки — в день обращения</div></div><div class="sum">от 3 000 ₽</div></div>
+      <div class="row"><div><div class="name">Адаптив под телефон</div><div class="sub">Если сайт уже есть</div></div><div class="sum">от 3 000 ₽</div></div>
+      <div class="row"><div><div class="name">Telegram-бот для заявок</div><div class="sub">Приём заявок, каталог, выгрузка</div></div><div class="sum">от 6 000 ₽</div></div>
+    </div>
+    <p style="color:var(--muted);font-size:14px;margin-top:24px">
+      Точную цену называю после того, как увижу задачу. Смотрю бесплатно и без обязательств.
+    </p>
+  </div>
+</section>
+
+<!-- ======================= КОНТАКТ ======================= -->
+<footer id="contact">
+  <div class="wrap center">
+    <h2>Расскажите, что нужно сделать</h2>
+    <p class="lead" style="max-width:560px;margin:18px auto 34px">
+      Отвечу в течение часа. Скажу честно, сколько это стоит и сколько займёт времени.
+      Если задача не моя — скажу прямо.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="mailto:volkovepta@gmail.com">volkovepta@gmail.com</a>
+      <a class="btn btn-line" href="https://github.com/happyvolkovajulia-ai">Проекты на GitHub</a>
+    </div>
+    <p class="foot-meta">
+      Иван Волков · вёрстка и разработка сайтов<br>
+      Работаю удалённо по всей России · Серпухов, Московская область
+    </p>
+  </div>
+</footer>
 
 <script>
 (function(){
@@ -572,60 +552,46 @@ h3{
 
   /* ---------- 1. Размытие под шапкой ---------- */
   var blur = document.getElementById('blurTop');
-  var onScrollBlur = function(){
-    if (!blur) return;
-    blur.classList.toggle('on', window.scrollY > 8);
-  };
+  function onScrollBlur(){
+    if (blur) blur.classList.toggle('on', window.scrollY > 8);
+  }
   window.addEventListener('scroll', onScrollBlur, { passive: true });
   onScrollBlur();
 
-  /* ---------- 2. Наложение секций: уходящая чуть уменьшается и темнеет ---------- */
-  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
-  var inners = panels.map(function(p){ return p.querySelector('.panel-inner'); });
-  var ticking = false;
-
-  function overlap(){
-    ticking = false;
-    if (reduce) return;
-    var vh = window.innerHeight;
-    for (var i = 0; i < panels.length - 1; i++){
-      var next = panels[i + 1].getBoundingClientRect();
-      // 0 — следующая секция ещё ниже экрана, 1 — накрыла верх
-      var p = (vh - next.top) / vh;
-      p = p < 0 ? 0 : (p > 1 ? 1 : p);
-      var el = inners[i];
-      if (!el) continue;
-      el.style.transform = 'scale(' + (1 - p * 0.04).toFixed(4) + ')';
-      el.style.setProperty('--dim', (p * 0.14).toFixed(3));
-    }
-  }
-  function requestOverlap(){
-    if (!ticking && !reduce){ ticking = true; window.requestAnimationFrame(overlap); }
-  }
-  window.addEventListener('scroll', requestOverlap, { passive: true });
-  window.addEventListener('resize', requestOverlap);
-  overlap();
-
-  /* ---------- 3. Появление блоков ---------- */
+  /* ---------- 2. Появление блоков из размытия и темноты ---------- */
   var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
-  var showAll = function(){ els.forEach(function(e){ e.classList.add('in'); }); };
 
-  if (!('IntersectionObserver' in window)) { showAll(); return; }
+  function show(el){ el.classList.add('in'); }
+
+  if (reduce || !('IntersectionObserver' in window)) {
+    els.forEach(show);
+    return;
+  }
 
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(en){
-      // Показываем и те, что вошли в экран, и те, что уже проскроллены выше.
+      // Показываем и те, что вошли в экран, и те, что уже выше него:
+      // иначе блоки, мимо которых проехали, остаются невидимыми.
       if (en.isIntersecting || en.boundingClientRect.top < 0) {
-        en.target.classList.add('in');
+        show(en.target);
         io.unobserve(en.target);
       }
     });
-  }, { rootMargin: '0px 0px -60px 0px', threshold: 0 });
+  }, { rootMargin: '0px 0px -70px 0px', threshold: 0 });
 
-  els.forEach(function(e){ io.observe(e); });
+  els.forEach(function(el){
+    io.observe(el);
+    // Снимаем нагрузку с GPU, как только появление закончилось
+    el.addEventListener('transitionend', function h(ev){
+      if (ev.propertyName === 'filter' || ev.propertyName === 'opacity') {
+        el.classList.add('done');
+        el.removeEventListener('transitionend', h);
+      }
+    });
+  });
 
-  // Страховка: что бы ни случилось, через 3 секунды показываем всё.
-  setTimeout(showAll, 3000);
+  // Страховка: через 4 секунды показываем всё, что осталось скрытым
+  setTimeout(function(){ els.forEach(show); }, 4000);
 })();
 </script>
 

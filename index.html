@@ -5,12 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Иван Волков — сайты и веб-приложения</title>
 <meta name="description" content="Вёрстка и разработка сайтов: лендинги под ключ, вёрстка по макету, доработка существующих сайтов. React, TypeScript, Node.js.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000000">
 
 <style>
 /* ============================================================
    ШРИФТЫ — размещены локально, без внешних сервисов.
-   Разбиты на подмножества, поэтому грузится только нужное.
    ============================================================ */
 @font-face{font-family:'Onest';font-style:normal;font-weight:400;font-display:swap;
   src:url('fonts/onest-cyrillic-400-normal.woff2') format('woff2');
@@ -50,9 +49,7 @@
   src:url('fonts/unbounded-latin-700-normal.woff2') format('woff2');
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 
-/* Знак рубля ₽ есть только в подмножестве latin-ext (диапазон U+20AD–20C0),
-   поэтому подключаем его отдельным правилом. Без этого ₽ рисуется системным
-   шрифтом и выбивается из подписей цен. */
+/* Знак рубля ₽ есть только в подмножестве latin-ext (диапазон U+20AD–20C0) */
 @font-face{font-family:'Unbounded';font-style:normal;font-weight:600;font-display:swap;
   src:url('fonts/unbounded-latin-ext-600-normal.woff2') format('woff2');
   unicode-range:U+20BD}
@@ -64,27 +61,34 @@
   unicode-range:U+20BD}
 
 /* ============================================================
-   Токены
+   Токены — ТЁМНАЯ ТЕМА
    ============================================================ */
 :root{
-  --bg:#ffffff;
-  --bg-alt:#f5f5f7;
-  --fg:#1d1d1f;
-  --muted:#6e6e73;
-  --line:rgba(0,0,0,.09);
-  --accent:#0071e3;
-  --accent-hover:#0077ed;
+  --bg:#000000;
+  --bg-alt:#0c0c0e;
+  --card:#141416;
+  --card-hi:#1c1c1f;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --dim:#6e6e73;
+  --line:rgba(255,255,255,.12);
+  --line-soft:rgba(255,255,255,.07);
+  --accent:#2997ff;
+  --accent-hover:#4aa8ff;
   --radius-card:26px;
   --radius-frame:16px;
   --max:1120px;
   --nav-h:52px;
   --font-display:'Unbounded',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   --font-text:'Onest',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  /* Настройки эффекта появления */
-  --reveal-blur:20px;
-  --reveal-dim:.45;
-  --reveal-shift:34px;
-  --reveal-step:90ms;
+  /* --- параметры выезда --- */
+  --reveal-shift:74px;      /* насколько блок выезжает снизу */
+  --reveal-blur:12px;       /* размытие на старте */
+  --reveal-dim:.42;         /* затемнение на старте */
+  --reveal-scale:.94;       /* масштаб на старте */
+  --reveal-dur:1s;
+  --reveal-step:95ms;       /* задержка между блоками в ряду */
+  --ease:cubic-bezier(.16,1,.3,1);   /* плавное «выезжание», как у Apple */
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -92,6 +96,7 @@ html{
   scroll-behavior:smooth;
   scroll-padding-top:calc(var(--nav-h) + 24px);
   -webkit-text-size-adjust:100%;
+  background:#000;
 }
 body{
   background:var(--bg);
@@ -116,10 +121,10 @@ a:hover{text-decoration:underline}
 .nav{
   position:fixed;left:0;right:0;top:0;z-index:100;
   height:var(--nav-h);
-  background:rgba(255,255,255,.66);
-  backdrop-filter:saturate(180%) blur(18px);
-  -webkit-backdrop-filter:saturate(180%) blur(18px);
-  border-bottom:1px solid rgba(0,0,0,.06);
+  background:rgba(0,0,0,.62);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line-soft);
 }
 .nav-in{
   max-width:var(--max);margin:0 auto;padding:0 22px;
@@ -129,25 +134,25 @@ a:hover{text-decoration:underline}
 .brand:hover{text-decoration:none}
 .brand-mark{
   width:22px;height:22px;border-radius:6px;flex:none;
-  background:linear-gradient(140deg,#1d1d1f,#4a4a4f);
-  display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;
+  background:linear-gradient(140deg,#f5f5f7,#8e8e93);
+  display:grid;place-items:center;color:#000;font-size:11px;font-weight:700;
   font-family:var(--font-display);
 }
 .nav-links{display:flex;gap:26px;font-size:13.5px}
-.nav-links a{color:var(--fg);opacity:.75;font-weight:450}
+.nav-links a{color:var(--fg);opacity:.72;font-weight:450}
 .nav-links a:hover{opacity:1;text-decoration:none}
 @media(max-width:720px){ .nav-links{display:none} }
 
 /* ============================================================
-   Прогрессивное размытие под шапкой (эффект iOS)
+   Размытие под шапкой
    ============================================================ */
 .blur-top{
   position:fixed;left:0;right:0;top:0;height:110px;z-index:95;
   pointer-events:none;
-  backdrop-filter:blur(9px) saturate(140%);
-  -webkit-backdrop-filter:blur(9px) saturate(140%);
-  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,.75) 42%,rgba(0,0,0,0) 100%);
-  mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,.75) 42%,rgba(0,0,0,0) 100%);
+  backdrop-filter:blur(10px) saturate(140%);
+  -webkit-backdrop-filter:blur(10px) saturate(140%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,.7) 42%,rgba(0,0,0,0) 100%);
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,.7) 42%,rgba(0,0,0,0) 100%);
   opacity:0;
   transition:opacity .4s ease;
 }
@@ -160,14 +165,14 @@ a:hover{text-decoration:underline}
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   border-radius:980px;font-size:15.5px;font-weight:500;
   padding:12px 25px;border:1px solid transparent;
-  transition:background-color .2s ease,color .2s ease,border-color .2s ease,translate .2s ease;
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease,translate .25s var(--ease);
   white-space:nowrap;font-family:var(--font-text);
 }
 .btn:hover{text-decoration:none;translate:0 -2px}
 .btn-solid{background:var(--accent);color:#fff}
 .btn-solid:hover{background:var(--accent-hover)}
-.btn-line{border-color:var(--fg);color:var(--fg)}
-.btn-line:hover{background:var(--fg);color:#fff}
+.btn-line{border-color:rgba(255,255,255,.45);color:var(--fg)}
+.btn-line:hover{background:var(--fg);color:#000;border-color:var(--fg)}
 
 /* ============================================================
    Типографика
@@ -193,21 +198,22 @@ h3{
 .eyebrow{
   font-family:var(--font-display);
   font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  color:#9a9aa0;margin-bottom:16px;
+  color:var(--dim);margin-bottom:16px;
 }
 .center{text-align:center}
 .center .lead{margin-left:auto;margin-right:auto}
 
 /* ============================================================
-   Секции — обычный поток, без наложения
+   Секции
    ============================================================ */
-section{padding:96px 0}
+section{padding:100px 0}
 .sec-alt{background:var(--bg-alt)}
 
 .hero{
-  padding:calc(var(--nav-h) + 92px) 0 96px;
+  padding:calc(var(--nav-h) + 96px) 0 104px;
   background:
-    radial-gradient(820px 460px at 50% -14%, rgba(0,113,227,.13), transparent 62%),
+    radial-gradient(900px 480px at 50% -16%, rgba(41,151,255,.22), transparent 64%),
+    radial-gradient(600px 320px at 82% 8%, rgba(120,80,255,.10), transparent 70%),
     var(--bg);
 }
 .hero h1{max-width:16ch;margin:0 auto 24px}
@@ -215,42 +221,79 @@ section{padding:96px 0}
 .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .pill{
   display:inline-flex;align-items:center;gap:8px;
-  background:var(--bg-alt);border-radius:980px;
-  padding:8px 17px;font-size:13.5px;font-weight:500;color:var(--muted);
+  background:rgba(255,255,255,.07);border:1px solid var(--line-soft);
+  border-radius:980px;padding:8px 17px;font-size:13.5px;font-weight:500;color:var(--muted);
   margin-bottom:26px;
 }
 .dot{width:8px;height:8px;border-radius:50%;background:#30d158;flex:none;
-  box-shadow:0 0 0 4px rgba(48,209,88,.16)}
+  box-shadow:0 0 0 4px rgba(48,209,88,.18)}
 
 /* ============================================================
-   ПОЯВЛЕНИЕ ИЗ РАЗМЫТИЯ И ТЕМНОТЫ
-   Анимируем только opacity / transform / filter — они идут
-   по GPU и не вызывают пересчёт макета.
+   ВЫЕЗД БЛОКОВ
+   Анимируем только opacity / transform / filter.
+   will-change НЕ ставим: блоков много и они крупные, а постоянный
+   will-change грузит GPU и приводит к подтормаживанию.
    ============================================================ */
-@media (prefers-reduced-motion: no-preference){
-  .reveal{
-    opacity:0;
-    transform:translate3d(0,var(--reveal-shift),0) scale(.98);
-    filter:blur(var(--reveal-blur)) brightness(calc(1 - var(--reveal-dim)));
-    transition:
-      opacity .85s cubic-bezier(.22,.8,.24,1),
-      transform .95s cubic-bezier(.22,.8,.24,1),
-      filter 1.05s cubic-bezier(.22,.8,.24,1);
-    transition-delay:calc(var(--i,0) * var(--reveal-step));
-    will-change:opacity,transform,filter;
+/* ============================================================
+   ВЫЕЗД БЛОКОВ
+   Анимируем только opacity / transform / filter.
+   will-change НЕ ставим: блоков много и они крупные, постоянный
+   will-change грузит GPU и приводит к подтормаживанию.
+
+   ПУТЬ 1 — нативные scroll-driven анимации (Chrome 115+, Safari 26+).
+   Прогресс привязан к положению блока в окне, как у Apple. Блок всегда
+   реагирует на прокрутку, поэтому «залипнуть» он не может в принципе.
+   ============================================================ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference){
+    .reveal{
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      /* старт — как только блок показался снизу,
+         финиш — когда он поднялся примерно на треть экрана.
+         --i сдвигает финиш, давая каскад внутри ряда. */
+      animation-range: entry 0% cover calc(30% + var(--i, 0) * 6%);
+    }
+    @keyframes reveal-rise{
+      from{
+        opacity:0;
+        transform:translate3d(0,var(--reveal-shift),0) scale(var(--reveal-scale));
+        filter:blur(var(--reveal-blur)) brightness(calc(1 - var(--reveal-dim)));
+      }
+      to{
+        opacity:1;
+        transform:translate3d(0,0,0) scale(1);
+        filter:blur(0px) brightness(1);
+      }
+    }
   }
-  .reveal.in{
-    opacity:1;
-    transform:none;
-    filter:none;
-  }
-  /* Когда появление закончилось — снимаем нагрузку с GPU */
-  .reveal.done{ will-change:auto }
 }
 
-/* Без анимации (или без JS) блоки просто видны */
+/* ПУТЬ 2 — запасной вариант для браузеров без scroll-driven (Firefox).
+   Блок показывается один раз, когда входит в экран. */
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference){
+    .reveal{
+      opacity:0;
+      transform:translate3d(0,var(--reveal-shift),0) scale(var(--reveal-scale));
+      filter:blur(var(--reveal-blur)) brightness(calc(1 - var(--reveal-dim)));
+      transition:
+        opacity calc(var(--reveal-dur) * .82) var(--ease),
+        transform var(--reveal-dur) var(--ease),
+        filter calc(var(--reveal-dur) * .9) var(--ease);
+      transition-delay:calc(var(--i,0) * var(--reveal-step));
+    }
+    .reveal.in{
+      opacity:1;
+      transform:translate3d(0,0,0) scale(1);
+      filter:blur(0px) brightness(1);
+    }
+    .reveal.done{filter:none}
+  }
+}
+
 @media (prefers-reduced-motion: reduce){
-  .reveal{opacity:1;transform:none;filter:none}
+  .reveal{opacity:1;transform:none;filter:none;animation:none}
 }
 
 /* ============================================================
@@ -258,45 +301,46 @@ section{padding:96px 0}
    ============================================================ */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:20px}
 .card{
-  background:#fff;border-radius:var(--radius-card);padding:32px 28px;
-  border:1px solid rgba(0,0,0,.05);
-  /* translate — отдельное свойство, поэтому подъём при наведении
-     не конфликтует с анимацией появления по transform */
-  transition:translate .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease;
+  background:var(--card);border-radius:var(--radius-card);padding:32px 28px;
+  border:1px solid var(--line-soft);
+  /* translate — отдельное свойство, не конфликтует с transform появления */
+  transition:translate .3s var(--ease),background-color .3s ease,border-color .3s ease;
 }
-.card:hover{translate:0 -5px;box-shadow:0 22px 44px -24px rgba(0,0,0,.22)}
+.card:hover{translate:0 -5px;background:var(--card-hi);border-color:var(--line)}
 .card p{color:var(--muted);font-size:15px;margin-top:10px}
 .price{
   display:inline-block;margin-top:20px;
   font-family:var(--font-display);font-size:14px;font-weight:600;letter-spacing:-.02em;
+  color:var(--fg);
 }
 
 /* ============================================================
    Проекты
    ============================================================ */
-.proj{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;margin-bottom:88px}
+.proj{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;margin-bottom:92px}
 .proj:last-child{margin-bottom:0}
 .proj.rev .proj-media{order:-1}
 @media(max-width:880px){
-  .proj{grid-template-columns:1fr;gap:32px;margin-bottom:64px}
+  .proj{grid-template-columns:1fr;gap:32px;margin-bottom:66px}
   .proj.rev .proj-media{order:0}
 }
 .proj h3{font-size:clamp(21px,2.7vw,29px);letter-spacing:-.028em;margin-bottom:13px}
 .proj .desc{color:var(--muted);font-size:16px;margin-bottom:20px}
 .tags{display:flex;gap:8px;flex-wrap:wrap}
 .tag{
-  font-size:12.5px;font-weight:500;color:var(--muted);
-  background:rgba(0,0,0,.045);border-radius:8px;padding:5px 11px;
+  font-size:12.5px;font-weight:500;color:#c7c7cc;
+  background:rgba(255,255,255,.07);border:1px solid var(--line-soft);
+  border-radius:8px;padding:5px 11px;
 }
-.meta{font-size:12.5px;color:#9a9aa0;margin-bottom:9px;font-weight:500;letter-spacing:.01em}
+.meta{font-size:12.5px;color:var(--dim);margin-bottom:9px;font-weight:500;letter-spacing:.01em}
 
 /* мокап телефона */
 .phones{display:flex;gap:15px;justify-content:center}
 .phone{
   flex:1 1 0;max-width:206px;aspect-ratio:1080/1711;
   padding:8px;border-radius:31px;
-  background:linear-gradient(155deg,#3a3a3f,#111);
-  box-shadow:0 34px 62px -28px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.09);
+  background:linear-gradient(155deg,#3a3a3f,#0a0a0b);
+  box-shadow:0 34px 62px -28px rgba(0,0,0,.9), inset 0 0 0 1px rgba(255,255,255,.10);
 }
 .phone-screen{width:100%;height:100%;border-radius:24px;overflow:hidden;background:#000}
 .phone-screen img{width:100%;height:100%;object-fit:cover;object-position:top center}
@@ -304,13 +348,13 @@ section{padding:96px 0}
 
 /* мокап браузера */
 .browser{
-  border-radius:var(--radius-frame);overflow:hidden;background:#fff;
+  border-radius:var(--radius-frame);overflow:hidden;background:#1c1c1e;
   border:1px solid var(--line);
-  box-shadow:0 44px 84px -36px rgba(0,0,0,.42);
+  box-shadow:0 44px 84px -36px rgba(0,0,0,.95);
 }
 .browser-bar{
   height:37px;display:flex;align-items:center;gap:7px;padding:0 15px;
-  background:#f5f5f7;border-bottom:1px solid var(--line);
+  background:#232326;border-bottom:1px solid var(--line-soft);
 }
 .browser-bar i{width:11px;height:11px;border-radius:50%;display:block;flex:none}
 .browser-bar i:nth-child(1){background:#ff5f57}
@@ -318,7 +362,7 @@ section{padding:96px 0}
 .browser-bar i:nth-child(3){background:#28c840}
 .browser-bar span{
   margin-left:12px;font-size:11.5px;color:var(--muted);
-  background:#fff;border-radius:6px;padding:3px 11px;border:1px solid var(--line);
+  background:#1c1c1e;border-radius:6px;padding:3px 11px;border:1px solid var(--line-soft);
 }
 .browser img{width:100%;display:block}
 
@@ -340,8 +384,8 @@ section{padding:96px 0}
 /* ============================================================
    Футер
    ============================================================ */
-footer{padding:96px 0 76px}
-.foot-meta{margin-top:34px;font-size:13px;color:var(--muted);line-height:1.75}
+footer{padding:100px 0 80px}
+.foot-meta{margin-top:34px;font-size:13px;color:var(--dim);line-height:1.75}
 </style>
 <script>document.documentElement.classList.add('js');</script>
 <noscript><style>
@@ -558,27 +602,35 @@ footer{padding:96px 0 76px}
   window.addEventListener('scroll', onScrollBlur, { passive: true });
   onScrollBlur();
 
-  /* ---------- 2. Появление блоков из размытия и темноты ---------- */
+  /* ---------- 2. Выезд блоков ---------- */
   var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
 
-  function show(el){ el.classList.add('in'); }
-
-  if (reduce || !('IntersectionObserver' in window)) {
-    els.forEach(show);
-    return;
+  function show(el){
+    if (el.classList.contains('in')) return;
+    el.classList.add('in');
+    // Как только выезд закончился, убираем фильтр совсем —
+    // так браузеру не приходится держать размытие постоянно.
+    window.setTimeout(function(){
+      if (el.classList.contains('in')) el.classList.add('done');
+    }, 1400);
   }
 
-  // Основной механизм — IntersectionObserver. Но у него есть дыра: если
-  // страницу резко прокрутить (или прыгнуть по якорю из меню), для блоков,
-  // которые проскочили мимо, колбэк может вообще не вызваться — их коэффициент
-  // пересечения не менялся. Тогда блок навсегда остаётся невидимым.
+  // Если браузер умеет нативные scroll-driven анимации — анимацией управляет
+  // CSS, и вмешиваться не нужно: там прогресс привязан к прокрутке.
+  var nativeScroll = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline', 'view()'));
+
+  if (reduce || nativeScroll) return;
+  if (!('IntersectionObserver' in window)) { els.forEach(show); return; }
+
+  // IntersectionObserver не вызывает колбэк для блоков, которые проскочили
+  // мимо при резкой прокрутке (их коэффициент пересечения не менялся).
   // Поэтому дополнительно проходим по ещё не показанным блокам на прокрутке.
   var pending = els.slice();
   var ticking = false;
 
   function sweep(){
     if (!pending.length) return;
-    var limit = window.innerHeight - 70;
+    var limit = window.innerHeight - 60;
     pending = pending.filter(function(el){
       if (el.getBoundingClientRect().top < limit) { show(el); return false; }
       return true;
@@ -604,22 +656,16 @@ footer{padding:96px 0 76px}
         io.unobserve(en.target);
       }
     });
-  }, { rootMargin: '0px 0px -70px 0px', threshold: 0 });
+  }, { rootMargin: '0px 0px -60px 0px', threshold: 0 });
 
-  els.forEach(function(el){
-    io.observe(el);
-    // Снимаем нагрузку с GPU, как только появление закончилось
-    el.addEventListener('transitionend', function h(ev){
-      if (ev.propertyName === 'filter' || ev.propertyName === 'opacity') {
-        el.classList.add('done');
-        el.removeEventListener('transitionend', h);
-      }
-    });
-  });
+  els.forEach(function(el){ io.observe(el); });
 
   window.addEventListener('scroll', onScrollReveal, { passive: true });
   window.addEventListener('resize', onScrollReveal);
   sweep();
+
+  // Страховка на случай, если что-то пошло не так и блок остался скрытым
+  window.setTimeout(function(){ els.forEach(show); }, 6000);
 })();
 </script>
 

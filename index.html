@@ -568,7 +568,10 @@ footer{padding:96px 0 76px}
     return;
   }
 
+  var observerAlive = false;
+
   var io = new IntersectionObserver(function(entries){
+    observerAlive = true;
     entries.forEach(function(en){
       // Показываем и те, что вошли в экран, и те, что уже выше него:
       // иначе блоки, мимо которых проехали, остаются невидимыми.
@@ -590,8 +593,10 @@ footer{padding:96px 0 76px}
     });
   });
 
-  // Страховка: через 4 секунды показываем всё, что осталось скрытым
-  setTimeout(function(){ els.forEach(show); }, 4000);
+  // Страховка только на случай, если наблюдатель вообще не сработал
+  // (например, JS частично сломан). Если он жив, ничего не показываем
+  // принудительно — иначе анимация теряет смысл.
+  setTimeout(function(){ if (!observerAlive) els.forEach(show); }, 2500);
 })();
 </script>
 

@@ -568,13 +568,37 @@ footer{padding:96px 0 76px}
     return;
   }
 
-  var observerAlive = false;
+  // Основной механизм — IntersectionObserver. Но у него есть дыра: если
+  // страницу резко прокрутить (или прыгнуть по якорю из меню), для блоков,
+  // которые проскочили мимо, колбэк может вообще не вызваться — их коэффициент
+  // пересечения не менялся. Тогда блок навсегда остаётся невидимым.
+  // Поэтому дополнительно проходим по ещё не показанным блокам на прокрутке.
+  var pending = els.slice();
+  var ticking = false;
+
+  function sweep(){
+    if (!pending.length) return;
+    var limit = window.innerHeight - 70;
+    pending = pending.filter(function(el){
+      if (el.getBoundingClientRect().top < limit) { show(el); return false; }
+      return true;
+    });
+    if (!pending.length) stopSweep();
+  }
+
+  function onScrollReveal(){
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function(){ ticking = false; sweep(); });
+  }
+
+  function stopSweep(){
+    window.removeEventListener('scroll', onScrollReveal);
+    window.removeEventListener('resize', onScrollReveal);
+  }
 
   var io = new IntersectionObserver(function(entries){
-    observerAlive = true;
     entries.forEach(function(en){
-      // Показываем и те, что вошли в экран, и те, что уже выше него:
-      // иначе блоки, мимо которых проехали, остаются невидимыми.
       if (en.isIntersecting || en.boundingClientRect.top < 0) {
         show(en.target);
         io.unobserve(en.target);
@@ -593,10 +617,9 @@ footer{padding:96px 0 76px}
     });
   });
 
-  // Страховка только на случай, если наблюдатель вообще не сработал
-  // (например, JS частично сломан). Если он жив, ничего не показываем
-  // принудительно — иначе анимация теряет смысл.
-  setTimeout(function(){ if (!observerAlive) els.forEach(show); }, 2500);
+  window.addEventListener('scroll', onScrollReveal, { passive: true });
+  window.addEventListener('resize', onScrollReveal);
+  sweep();
 })();
 </script>
 
